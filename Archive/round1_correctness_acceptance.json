@@ -1,0 +1,42 @@
+```acceptance-report
+{
+  "criteriaSatisfied": [
+    {
+      "id": "criterion-1",
+      "status": "satisfied",
+      "evidence": "Reviewed all 18 source files across the codebase. Identified B1 (fetchMatches() missing from API client, src/lib/api/worldcup26.ts), B2 (page.tsx is pure client component with no SSR, src/app/page.tsx line 1), B3 (no refetchMatches() hook method, src/hooks/useTournamentData.ts), plus 8 notes (N1–N8). Evidence includes specific file paths and line numbers for every finding. All 22 tests pass. Type definitions verified against actual API schema — all fields match."
+    }
+  ],
+  "changedFiles": [
+    "round1_correctness_review.md"
+  ],
+  "testsAddedOrUpdated": [],
+  "commandsRun": [
+    {
+      "command": "npx jest --no-cache",
+      "result": "passed",
+      "summary": "All 22 tests passed across 3 test suites (championships.test.ts, flags.test.ts, tournament.test.ts)"
+    }
+  ],
+  "validationOutput": [
+    "fetchMatches() does not exist in src/lib/api/worldcup26.ts — only fetchTeams, fetchGroups, fetchStadiums are exported",
+    "src/app/page.tsx line 1 is 'use client' — no server component wrapper exists",
+    "useTournamentData.ts exports refetch() but not refetchMatches()",
+    "transformApiGroup sorts by only 3 of 8 FIFA tiebreaker steps (points → GD → GF → name)",
+    "ApiTeam/ApiGroup types match actual worldcup26.ir API schema (verified field-by-field)",
+    "fixtures.json exists at src/data/fixtures.json but is never loaded by the application",
+    "Bracket connector lines (Phase 5.4) not implemented — no SVG between rounds",
+    "Auto-refresh uses setInterval(60s) not debounce as specified in Phase 7.1"
+  ],
+  "residualRisks": [
+    "Without fetchMatches(), the knockout bracket is always empty — the core tournament feature is non-functional",
+    "Without SSR, the page shows blank content until API responds — poor initial load experience and no SEO benefit from server content",
+    "Without refetchMatches(), auto-refresh only refreshes teams/groups not matches — even if fetchMatches() were added, the auto-refresh wouldn't refetch match data",
+    "Tiebreaker logic incomplete (3/8 steps) — if the app ever computes standings from match data instead of relying on API pre-computed data, edge-case standings will be incorrect",
+    "fixtures.json is dead code — exists but never loaded as an API fallback",
+    "No tests for retry logic or API client network behavior — retry mechanism is untested"
+  ],
+  "noStagedFiles": true,
+  "notes": "The most critical finding is B1: fetchMatches() is entirely missing from the API client. The plan (Phase 2.2) explicitly requires GET /get/games, and the entire knockout bracket feature depends on match data. Without it, the bracket will always be empty. The page is also purely client-side (B2), contradicting the plan's SSR requirement (Phase 8.1). These two blockers are cascading — even if fetchMatches() were added, the client-side page pattern means there's no server-side data fetching path. The implementation is otherwise structurally sound: types match the API schema, transform functions are correct (for the scope implemented), bracket node rendering handles all edge cases, error boundary and loading states are in place, SEO metadata is complete, and all 22 tests pass. The tiebreaker implementation covers only the first 3 of 8 FIFA steps, which is acceptable for the current approach (relying on API pre-computed standings) but would produce incorrect results if standings were ever computed from raw match data."
+}
+```
