@@ -162,4 +162,18 @@ describe("Tooltip", () => {
     const tooltip = screen.getByRole("tooltip");
     expect(tooltip).toHaveAttribute("tabIndex", "-1");
   });
+
+  it("renders tooltip popup in a portal attached to document.body", () => {
+    render(
+      <Tooltip content="Portal test">
+        <span>Trigger</span>
+      </Tooltip>
+    );
+    const trigger = screen.getByText("Trigger");
+    fireEvent.mouseEnter(trigger.closest("div")!);
+    // The tooltip should be rendered in a portal on document.body
+    const tooltipInBody = document.body.querySelector('[role="tooltip"]');
+    expect(tooltipInBody).toBeInTheDocument();
+    expect(tooltipInBody).toHaveTextContent("Portal test");
+  });
 });

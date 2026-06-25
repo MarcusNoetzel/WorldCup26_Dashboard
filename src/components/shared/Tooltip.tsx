@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface TooltipProps {
   content: string;
@@ -8,10 +9,46 @@ interface TooltipProps {
   id?: string;
 }
 
+interface Position {
+  top: number;
+  left: number;
+}
+
 export default function Tooltip({ content, children, id }: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [position, setPosition] = useState<Position>({ top: 0, left: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const tooltipId = id || `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+
+  // Guard SSR — only render portal after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Compute tooltip position from trigger element
+  const updatePosition = useCallback(() => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.top - 8, // 8px gap above trigger (mb-2 equivalent)
+        left: rect.left + rect.width / 2, // center horizontally
+      });
+    }
+  }, []);
+
+  // Position on open and on resize/scroll
+  useLayoutEffect(() => {
+    if (isOpen) {
+      updatePosition();
+      window.addEventListener("resize", updatePosition);
+      window.addEventListener("scroll", updatePosition, { passive: true });
+      return () => {
+        window.removeEventListener("resize", updatePosition);
+        window.removeEventListener("scroll", updatePosition);
+      };
+    }
+  }, [isOpen, updatePosition]);
 
   // Click-outside dismissal
   useEffect(() => {
@@ -44,6 +81,32 @@ export default function Tooltip({ content, children, id }: TooltipProps) {
     setIsOpen((prev) => !prev);
   }, []);
 
+  // Tooltip popup content — rendered in portal when mounted
+  const tooltipContent = mounted ? (
+    createPortal(
+      <div
+        id={tooltipId}
+        role="tooltip"
+        tabIndex={-1}
+        style={{
+          position: "fixed",
+          top: position.top,
+          left: position.left,
+          transform: "translateX(-50%)",
+          marginTop: "-100%", // position above the computed top
+        }}
+        className={`px-2.5 py-1.5 text-xs text-white bg-fifa-blue-900 rounded shadow-lg whitespace-nowrap z-50 transition-opacity duration-150 ${
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        {content}
+        {/* Downward arrow */}
+        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-fifa-blue-900" />
+      </div>,
+      document.body
+    )
+  ) : null;
+
   return (
     <div
       ref={containerRef}
@@ -63,19 +126,8 @@ export default function Tooltip({ content, children, id }: TooltipProps) {
         </span>
       </span>
 
-      {/* Tooltip popup */}
-      <div
-        id={tooltipId}
-        role="tooltip"
-        tabIndex={-1}
-        className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2.5 py-1.5 text-xs text-white bg-fifa-blue-900 rounded shadow-lg whitespace-nowrap z-50 transition-opacity duration-150 ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-      >
-        {content}
-        {/* Downward arrow */}
-        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-fifa-blue-900" />
-      </div>
+      {/* Tooltip popup rendered in portal */}
+      {tooltipContent}
     </div>
   );
 }
