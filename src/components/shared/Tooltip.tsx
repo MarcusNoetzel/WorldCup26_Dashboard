@@ -5,12 +5,13 @@ import { useState, useRef, useEffect, useCallback } from "react";
 interface TooltipProps {
   content: string;
   children: React.ReactNode;
+  id?: string;
 }
 
-export default function Tooltip({ content, children }: TooltipProps) {
+export default function Tooltip({ content, children, id }: TooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const tooltipId = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+  const tooltipId = id || `tooltip-${Math.random().toString(36).substr(2, 9)}`;
 
   // Click-outside dismissal
   useEffect(() => {

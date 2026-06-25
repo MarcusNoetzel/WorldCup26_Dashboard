@@ -43,28 +43,28 @@ export default function GroupTable({ group }: GroupTableProps) {
             <th className="py-1 px-1 text-center w-6">#</th>
             <th className="py-1 px-1 text-left">Team</th>
             <th className="py-1 px-1 text-center w-6">
-              <Tooltip content={headerTooltips.P}>P</Tooltip>
+              <Tooltip content={headerTooltips.P} id={`tooltip-${group.name}-P`}>P</Tooltip>
             </th>
             <th className="py-1 px-1 text-center w-6">
-              <Tooltip content={headerTooltips.W}>W</Tooltip>
+              <Tooltip content={headerTooltips.W} id={`tooltip-${group.name}-W`}>W</Tooltip>
             </th>
             <th className="py-1 px-1 text-center w-6">
-              <Tooltip content={headerTooltips.D}>D</Tooltip>
+              <Tooltip content={headerTooltips.D} id={`tooltip-${group.name}-D`}>D</Tooltip>
             </th>
             <th className="py-1 px-1 text-center w-6">
-              <Tooltip content={headerTooltips.L}>L</Tooltip>
+              <Tooltip content={headerTooltips.L} id={`tooltip-${group.name}-L`}>L</Tooltip>
             </th>
             <th className="py-1 px-1 text-center w-6">
-              <Tooltip content={headerTooltips.GF}>GF</Tooltip>
+              <Tooltip content={headerTooltips.GF} id={`tooltip-${group.name}-GF`}>GF</Tooltip>
             </th>
             <th className="py-1 px-1 text-center w-6">
-              <Tooltip content={headerTooltips.GA}>GA</Tooltip>
+              <Tooltip content={headerTooltips.GA} id={`tooltip-${group.name}-GA`}>GA</Tooltip>
             </th>
             <th className="py-1 px-1 text-center w-6">
-              <Tooltip content={headerTooltips.GD}>GD</Tooltip>
+              <Tooltip content={headerTooltips.GD} id={`tooltip-${group.name}-GD`}>GD</Tooltip>
             </th>
             <th className="py-1 px-1 text-center w-8 font-bold">
-              <Tooltip content={headerTooltips.Pts}>Pts</Tooltip>
+              <Tooltip content={headerTooltips.Pts} id={`tooltip-${group.name}-Pts`}>Pts</Tooltip>
             </th>
           </tr>
         </thead>
