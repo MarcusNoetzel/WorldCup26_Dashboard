@@ -136,4 +136,45 @@ describe("GroupTable", () => {
     const table = screen.getByRole("table");
     expect(table).toHaveAttribute("aria-label", "Group A standings");
   });
+
+  it("truncates long team names with ellipsis", () => {
+    const longNameGroup: Group = {
+      name: "Z",
+      teams: [],
+      standings: [
+        {
+          position: 1,
+          team: {
+            id: 999,
+            name: "Republic of the Congo-Brazzaville",
+            code: "CGO",
+            iso2: "cg",
+            flag: "https://flagcdn.com/w40/cg.png",
+            pastChampionships: 0,
+            group: "Z",
+          },
+          played: 0,
+          won: 0,
+          drawn: 0,
+          lost: 0,
+          goalsFor: 0,
+          goalsAgainst: 0,
+          goalDifference: 0,
+          points: 0,
+        },
+      ],
+    };
+    render(<GroupTable group={longNameGroup} />);
+    const teamNameSpan = screen.getByText("Republic of the Congo-Brazzaville");
+    // The span should have the truncate class which applies text-overflow: ellipsis
+    expect(teamNameSpan).toHaveClass("truncate");
+    // The parent td should have min-w-0 to allow shrinking
+    const teamCell = teamNameSpan.closest("td");
+    expect(teamCell).toBeTruthy();
+    expect(teamCell?.className).toContain("min-w-0");
+    // The flex container should also have min-w-0
+    const flexContainer = teamNameSpan.parentElement;
+    expect(flexContainer).toBeTruthy();
+    expect(flexContainer?.className).toContain("min-w-0");
+  });
 });

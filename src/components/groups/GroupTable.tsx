@@ -77,8 +77,8 @@ export default function GroupTable({ group }: GroupTableProps) {
               <td className="py-1 px-1 text-center text-gray-500">
                 {standing.position}
               </td>
-              <td className="py-1 px-1">
-                <div className="flex items-center gap-1.5">
+              <td className="py-1 px-1 min-w-0 overflow-hidden">
+                <div className="flex items-center gap-1.5 min-w-0">
                   <div className="flex-shrink-0 w-5 h-4 relative">
                     {standing.team.flag ? (
                       <Image
