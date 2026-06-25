@@ -1,10 +1,22 @@
 import Image from "next/image";
 import type { Group } from "@/lib/types/group";
 import { getFlagUrl } from "@/lib/utils/flags";
+import Tooltip from "@/components/shared/Tooltip";
 
 interface GroupTableProps {
   group: Group;
 }
+
+const headerTooltips: Record<string, string> = {
+  P: "Played: Number of matches played",
+  W: "Won: Number of matches won",
+  D: "Drawn: Number of matches drawn",
+  L: "Lost: Number of matches lost",
+  GF: "Goals For: Total goals scored",
+  GA: "Goals Against: Total goals conceded",
+  GD: "Goal Difference: Goals scored minus goals conceded",
+  Pts: "Points: 3 for a win, 1 for a draw, 0 for a loss",
+};
 
 export default function GroupTable({ group }: GroupTableProps) {
   const getRowColor = (position: number): string => {
@@ -30,14 +42,30 @@ export default function GroupTable({ group }: GroupTableProps) {
           <tr className="text-gray-500 border-b border-gray-200">
             <th className="py-1 px-1 text-center w-6">#</th>
             <th className="py-1 px-1 text-left">Team</th>
-            <th className="py-1 px-1 text-center w-6">P</th>
-            <th className="py-1 px-1 text-center w-6">W</th>
-            <th className="py-1 px-1 text-center w-6">D</th>
-            <th className="py-1 px-1 text-center w-6">L</th>
-            <th className="py-1 px-1 text-center w-6">GF</th>
-            <th className="py-1 px-1 text-center w-6">GA</th>
-            <th className="py-1 px-1 text-center w-6">GD</th>
-            <th className="py-1 px-1 text-center w-8 font-bold">Pts</th>
+            <th className="py-1 px-1 text-center w-6">
+              <Tooltip content={headerTooltips.P}>P</Tooltip>
+            </th>
+            <th className="py-1 px-1 text-center w-6">
+              <Tooltip content={headerTooltips.W}>W</Tooltip>
+            </th>
+            <th className="py-1 px-1 text-center w-6">
+              <Tooltip content={headerTooltips.D}>D</Tooltip>
+            </th>
+            <th className="py-1 px-1 text-center w-6">
+              <Tooltip content={headerTooltips.L}>L</Tooltip>
+            </th>
+            <th className="py-1 px-1 text-center w-6">
+              <Tooltip content={headerTooltips.GF}>GF</Tooltip>
+            </th>
+            <th className="py-1 px-1 text-center w-6">
+              <Tooltip content={headerTooltips.GA}>GA</Tooltip>
+            </th>
+            <th className="py-1 px-1 text-center w-6">
+              <Tooltip content={headerTooltips.GD}>GD</Tooltip>
+            </th>
+            <th className="py-1 px-1 text-center w-8 font-bold">
+              <Tooltip content={headerTooltips.Pts}>Pts</Tooltip>
+            </th>
           </tr>
         </thead>
         <tbody>

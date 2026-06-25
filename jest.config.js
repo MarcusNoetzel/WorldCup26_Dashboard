@@ -5,7 +5,15 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   transform: {
-    "^.+\\.(ts|tsx)$": ["ts-jest", { useESM: true }],
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        useESM: true,
+        tsconfig: {
+          jsx: "react-jsx",
+        },
+      },
+    ],
   },
   transformIgnorePatterns: ["/node_modules/"],
   testPathIgnorePatterns: ["/node_modules/", "/.next/"],
