@@ -137,6 +137,12 @@ describe("GroupTable", () => {
     expect(table).toHaveAttribute("aria-label", "Group A standings");
   });
 
+  it("table uses table-fixed for proper column width constraint", () => {
+    render(<GroupTable group={mockGroup} />);
+    const table = screen.getByRole("table");
+    expect(table).toHaveClass("table-fixed");
+  });
+
   it("truncates long team names with ellipsis", () => {
     const longNameGroup: Group = {
       name: "Z",

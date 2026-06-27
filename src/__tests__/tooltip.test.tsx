@@ -176,4 +176,93 @@ describe("Tooltip", () => {
     expect(tooltipInBody).toBeInTheDocument();
     expect(tooltipInBody).toHaveTextContent("Portal test");
   });
+
+  it("aligns tooltip right when it would overflow the viewport edge", () => {
+    // Simulate a narrow viewport
+    Object.defineProperty(window, "innerWidth", {
+      writable: true,
+      configurable: true,
+      value: 300,
+    });
+
+    // Mock getBoundingClientRect to simulate tooltip extending past right edge
+    const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = () =>
+      ({
+        left: 250,
+        right: 587, // extends past 300px viewport
+        top: 0,
+        bottom: 30,
+        width: 337,
+        height: 30,
+      } as DOMRect);
+
+    // Mock requestAnimationFrame to execute synchronously
+    const originalRaf = window.requestAnimationFrame;
+    (window as any).requestAnimationFrame = (cb: FrameRequestCallback) => {
+      cb(0);
+      return 0;
+    };
+
+    render(
+      <Tooltip content="Goal Difference: Goals scored minus goals conceded">
+        <span>GD</span>
+      </Tooltip>
+    );
+
+    const trigger = screen.getByText("GD");
+    fireEvent.mouseEnter(trigger.closest("div")!);
+
+    const tooltip = screen.getByRole("tooltip");
+    // After requestAnimationFrame, the tooltip should be right-aligned
+    expect(tooltip).toHaveClass("right-0");
+    expect(tooltip).not.toHaveClass("-translate-x-1/2");
+
+    // Restore
+    Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+    window.requestAnimationFrame = originalRaf;
+    Object.defineProperty(window, "innerWidth", {
+      writable: true,
+      configurable: true,
+      value: 1920,
+    });
+  });
+
+  it("keeps center alignment when tooltip fits within viewport", () => {
+    // Mock getBoundingClientRect to simulate tooltip fitting within viewport
+    const originalGetBoundingClientRect = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = () =>
+      ({
+        left: 100,
+        right: 400, // well within 1920px viewport
+        top: 0,
+        bottom: 30,
+        width: 300,
+        height: 30,
+      } as DOMRect);
+
+    // Mock requestAnimationFrame to execute synchronously
+    const originalRaf = window.requestAnimationFrame;
+    (window as any).requestAnimationFrame = (cb: FrameRequestCallback) => {
+      cb(0);
+      return 0;
+    };
+
+    render(
+      <Tooltip content="Short tooltip">
+        <span>Trigger</span>
+      </Tooltip>
+    );
+
+    const trigger = screen.getByText("Trigger");
+    fireEvent.mouseEnter(trigger.closest("div")!);
+
+    const tooltip = screen.getByRole("tooltip");
+    expect(tooltip).toHaveClass("left-1/2");
+    expect(tooltip).toHaveClass("-translate-x-1/2");
+
+    // Restore
+    Element.prototype.getBoundingClientRect = originalGetBoundingClientRect;
+    window.requestAnimationFrame = originalRaf;
+  });
 });

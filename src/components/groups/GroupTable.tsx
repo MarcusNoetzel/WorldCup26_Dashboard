@@ -37,7 +37,7 @@ export default function GroupTable({ group }: GroupTableProps) {
       <div className="bg-fifa-blue-900 text-white px-3 py-2 text-center font-bold text-sm">
         Group {group.name}
       </div>
-      <table className="w-full text-xs table-layout-fixed" role="table" aria-label={`Group ${group.name} standings`}>
+      <table className="w-full text-xs table-fixed" role="table" aria-label={`Group ${group.name} standings`}>
         <thead>
           <tr className="text-gray-500 border-b border-gray-200">
             <th className="py-1 px-1 text-center w-6">#</th>
